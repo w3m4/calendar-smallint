@@ -5,7 +5,7 @@ There are two SQL scripts provided currently - one for PostgreSQL and one for SQ
 
 The main feature of the Dates dimension table is the use of a smallint as the surrogate primary key.  This reduces the size of fact tables that would normally store date keys as an integers, e.g. 20160308.  Using a 2 byte smallint instead of a 4 byte integer saves twice as much space for every record.
 
-Another feature is the use of negative integers to essentially double the possible date range:
+Another feature is the use of negative integers to essentially double the date range:
 
 | DateId | Date       |
 | -----: | ---------- |

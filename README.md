@@ -3,7 +3,7 @@ Concise SQL calendar script based on a smallint surrogate primary key
 
 There are two SQL scripts provided currently - one for PostgreSQL and one for SQL Server.  Each script is intended to run in their respective databases to create a Dates table.
 
-The main feature of the Dates dimension table is the use of a smallint as the surrogate primary key.  This reduces the size of fact tables that would normally store date keys as an integers, e.g. 20160308.  Using a 2 byte smallint instead of a 4 byte integer saves twice as much space and should improve performance for very large fact tables.
+The main feature of the Dates dimension table is the use of a smallint as the surrogate primary key.  This reduces the size of fact tables that would normally store date keys as integers, e.g. 20160308.  Using a 2 byte smallint instead of a 4 byte integer saves twice as much space and should improve performance for very large fact tables.
 
 Another feature is the use of negative integers to essentially double the date range:
 

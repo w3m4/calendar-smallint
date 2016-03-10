@@ -1,0 +1,89 @@
+DROP TABLE IF EXISTS "Dates";
+
+CREATE TABLE "Dates"
+(
+  "DateId" smallint NOT NULL,
+  "Date" date,
+  "IsoDate" varchar(10) NOT NULL, --ISO 8601 extended format, '2002-04-20'
+  "IsoIntDate" integer NOT NULL, --ISO 8601 basic format, 20020420
+  "Year" smallint NOT NULL,
+  "IsoYear" smallint NOT NULL, --4-digit year based on the ISO standard
+  "Quarter" smallint NOT NULL, --quarter of year (1, 2, 3, 4; January - March = 1).
+  "Month" smallint NOT NULL, --month of year (1-12)
+  "MonthName" varchar(9) NOT NULL, --Name of month capitalized
+  "Week" smallint NOT NULL, --week number of year (1-53) (The first week starts on the first day of the year.)
+  "IsoWeek" smallint NOT NULL, --ISO week number of year (1 - 53; the first Thursday of the new year is in week 1.)
+  "Day" smallint NOT NULL, --day of month (1-31)
+  "DayName" varchar(9) NOT NULL, --Name of day capitalized
+  "DayOfWeek" smallint NOT NULL, --day of the week, Sunday(1) to Saturday(7)
+  "IsoDayOfWeek" smallint NOT NULL, --ISO day of the week, Monday(1) to Sunday(7)
+  "DayOfYear" smallint NOT NULL, --day of year (1-366)
+  "IsoDayOfYear" smallint NOT NULL, --ISO day of year (1-371; day 1 of the year is Monday of the first ISO week.)
+  "IsWeekday" boolean NOT NULL,
+  "IsWeekend" boolean NOT NULL,
+  CONSTRAINT "PK_DateId" PRIMARY KEY ("DateId")
+)
+
+INSERT
+   INTO "Dates" ("DateId", "Date", "IsoDate", "IsoIntDate", "Year", "IsoYear",
+        "Quarter", "Month", "MonthName", "Week", "IsoWeek", "Day", "DayName", 
+        "DayOfWeek", "IsoDayOfWeek", "DayOfYear", "IsoDayOfYear", "IsWeekday",
+        "IsWeekend")
+
+ SELECT "DateId", "Date", "IsoDate", "IsoIntDate", "Year", "IsoYear", "Quarter",
+        "Month", "MonthName", "Week", "IsoWeek", "Day", "DayName", "DayOfWeek",
+        "IsoDayOfWeek", "DayOfYear", "IsoDayOfYear", "IsWeekday", "IsWeekend"
+   FROM (
+
+ SELECT CAST((row_number() OVER (ORDER BY "Date")) - 25568 AS smallint) AS "DateId",
+        CAST("Date" AS date) AS "Date",
+        CAST(to_char("Date", 'YYYY-MM-DD') AS varchar(10)) AS "IsoDate",
+        CAST(to_char("Date", 'YYYYMMDD') AS integer) AS "IsoIntDate",
+        CAST(to_char("Date", 'YYYY') AS smallint) AS "Year",
+        CAST(to_char("Date", 'IYYY') AS smallint) AS "IsoYear",
+        CAST(to_char("Date", 'Q') AS smallint) AS "Quarter",
+        CAST(to_char("Date", 'MM') AS smallint) AS "Month",
+        CAST(to_char("Date", 'Month') AS varchar(9)) AS "MonthName",
+        CAST(to_char("Date", 'WW') AS smallint) AS "Week",
+        CAST(to_char("Date", 'IW') AS smallint) AS "IsoWeek",
+        CAST(to_char("Date", 'DD') AS smallint) AS "Day",
+        CAST(to_char("Date", 'Day') AS varchar(9)) AS "DayName",
+        CAST(to_char("Date", 'D') AS smallint) AS "DayOfWeek",
+        CAST(to_char("Date", 'ID') AS smallint) AS "IsoDayOfWeek",
+        CAST(to_char("Date", 'DDD') AS smallint) AS "DayOfYear",
+        CAST(to_char("Date", 'IDDD') AS smallint) AS "IsoDayOfYear",
+        CAST(CASE WHEN to_char("Date", 'ID') IN ('6', '7') THEN 0 ELSE 1 END AS boolean) AS "IsWeekday",
+        CAST(CASE WHEN to_char("Date", 'ID') IN ('6', '7') THEN 1 ELSE 0 END AS boolean) AS "IsWeekend"
+   FROM generate_series(CAST('1900-01-01' AS date), CAST('1969-12-31' AS date), '1 day') AS "Date"
+
+  UNION
+
+ SELECT 0, NULL, '', 0, 0, 0, 0, 0, '', 0, 0, 0, '', 0, 0, 0, 0, CAST(0 AS boolean), CAST(0 AS boolean)
+
+  UNION
+
+ SELECT CAST((row_number() OVER (ORDER BY "Date")) AS smallint) AS "DateId",
+        CAST("Date" AS date) AS "Date",
+        CAST(to_char("Date", 'YYYY-MM-DD') AS varchar(10)) AS "IsoDate",
+        CAST(to_char("Date", 'YYYYMMDD') AS integer) AS "IsoIntDate",
+        CAST(to_char("Date", 'YYYY') AS smallint) AS "Year",
+        CAST(to_char("Date", 'IYYY') AS smallint) AS "IsoYear",
+        CAST(to_char("Date", 'Q') AS smallint) AS "Quarter",
+        CAST(to_char("Date", 'MM') AS smallint) AS "Month",
+        CAST(to_char("Date", 'Month') AS varchar(9)) AS "MonthName",
+        CAST(to_char("Date", 'WW') AS smallint) AS "Week",
+        CAST(to_char("Date", 'IW') AS smallint) AS "IsoWeek",
+        CAST(to_char("Date", 'DD') AS smallint) AS "Day",
+        CAST(to_char("Date", 'Day') AS varchar(9)) AS "DayName",
+        CAST(to_char("Date", 'D') AS smallint) AS "DayOfWeek",
+        CAST(to_char("Date", 'ID') AS smallint) AS "IsoDayOfWeek",
+        CAST(to_char("Date", 'DDD') AS smallint) AS "DayOfYear",
+        CAST(to_char("Date", 'IDDD') AS smallint) AS "IsoDayOfYear",
+        CAST(CASE WHEN to_char("Date", 'ID') IN ('6', '7') THEN 0 ELSE 1 END AS boolean) AS "IsWeekday",
+        CAST(CASE WHEN to_char("Date", 'ID') IN ('6', '7') THEN 1 ELSE 0 END AS boolean) AS "IsWeekend"
+   FROM generate_series(CAST('1970-01-01' AS date), CAST('2039-12-31' AS date), '1 day') AS "Date"
+
+) u
+  ORDER
+     BY "DateId"
+

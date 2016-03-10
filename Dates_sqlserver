@@ -1,0 +1,85 @@
+IF OBJECT_ID('dbo.[Dates]') IS NOT NULL DROP TABLE dbo.[Dates]
+
+ CREATE TABLE dbo.[Dates] (
+    DateId smallint NOT NULL PRIMARY KEY,
+    [Date] date,
+    [Year] smallint NOT NULL,
+    IsoYear smallint NOT NULL,
+    [Quarter] tinyint NOT NULL,
+    [Month] tinyint NOT NULL,
+    [MonthName] varchar(9) NOT NULL,
+    [Week] tinyint NOT NULL,
+    IsoWeek tinyint NOT NULL,
+    [Day] tinyint NOT NULL,
+    [DayName] varchar(9) NOT NULL,
+    [DayOfWeek] tinyint NOT NULL,
+    IsoDayOfWeek tinyint NOT NULL,
+    [DayOfYear] smallint NOT NULL,
+    IsoDayOfYear smallint NOT NULL,
+    IsWeekDay bit NOT NULL,
+    IsWeekEnd bit NOT NULL
+ )
+
+INSERT INTO dbo.[Dates] (
+  DateId, 
+  [Date], 
+	[Year], 
+	IsoYear, 
+	[Quarter], 
+	[Month], 
+	[MonthName], 
+	[Week], 
+	IsoWeek, 
+	[Day], 
+	[DayName], 
+	[DayOfWeek], 
+	IsoDayOfWeek, 
+	[DayOfYear], 
+	IsoDayOfYear, 
+	IsWeekDay, 
+	IsWeekEnd
+)
+
+ SELECT DateId, 
+        [Date],
+		YEAR([Date]) AS [Year],
+		CASE
+		  WHEN DATEPART(ISO_WEEK, [Date]) > 51 AND MONTH([Date]) = 1 THEN -1
+		  WHEN DATEPART(ISO_WEEK, [Date]) = 1 AND MONTH([Date]) = 12 THEN +1
+		  ELSE 0
+		END + YEAR([Date]) AS IsoYear,
+		DATEPART(quarter, [Date]) AS [Quarter],
+		MONTH([Date]) AS [Month],
+		DATENAME(month, [Date]) AS [MonthName],
+		DATEPART(week, [Date]) AS [Week],
+		DATEPART(ISO_WEEK, [Date]) AS IsoWeek,
+		DAY([Date]) AS [Day],
+		DATENAME(weekday, [Date]) AS [DayName],
+		DATEPART(weekday, [Date]) AS [DayOfWeek],
+		DATEPART(weekday, DATEADD(DAY, -1, [Date])) AS IsoDayOfWeek,
+		DATEPART(dayofyear, [Date]) AS [DayOfYear],
+		ROW_NUMBER() OVER (PARTITION BY
+		  CASE
+			 WHEN DATEPART(ISO_WEEK, [Date]) > 51 AND MONTH([Date]) = 1 THEN -1
+			 WHEN DATEPART(ISO_WEEK, [Date]) = 1 AND MONTH([Date]) = 12 THEN +1
+		     ELSE 0
+		  END + YEAR([Date]) ORDER BY [Date]) AS IsoDayOfYear,
+		CASE WHEN DATEPART(weekday, [Date]) IN (1, 7) THEN 0 ELSE 1 END AS IsWeekday,
+		CASE WHEN DATEPART(weekday, [Date]) IN (1, 7) THEN 1 ELSE 0 END AS IsWeekend
+   FROM (
+ SELECT -n AS DateId,
+        DATEADD(DAY, -n, CAST('1970-01-01' AS date)) AS [Date]
+   FROM #t
+  WHERE n < 25568
+
+  UNION
+
+ SELECT n,
+        DATEADD(DAY, n, CAST('1969-12-31' AS date))
+   FROM #t
+  WHERE n < 25568
+) u
+
+  UNION
+
+ SELECT 0, NULL, 0, 0, 0, 0, '', 0, 0, 0, '', 0, 0, 0, 0, 0, 0

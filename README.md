@@ -7,29 +7,19 @@ The main feature of the Dates dimension table is the use of a smallint as the su
 
 Another feature is the use of negative integers to essentially double the possible date range:
 
-DateId     Date
-
--25567     1900-01-01 
-
--25566     1900-01-02 
-
-... 
-
--2         1969-12-30 
-
--1         1969-12-31 
-
-0          NULL 
-
-1          1970-01-01 
-
-2       1970-01-02 
-
-... 
-
-25566   2039-12-30 
-
-25567   2039-12-31 
+| DateId | Date       |
+| -----: | ---------- |
+| -25567 | 1900-01-01 |
+| -25566 | 1900-01-02 |
+| ...    | ...        |
+| -2     | 1969-12-30 |
+| -1     | 1969-12-31 |
+| 0      | NULL       |
+| 1      | 1970-01-01 |
+| 2      | 1970-01-02 |
+| ...    | ...        |
+| 25566  | 2039-12-30 |
+| 25567  | 2039-12-31 |
 
 
  

@@ -1,5 +1,5 @@
 # calendar-smallint
-Concise SQL calendar script based on a smallint primary key
+Concise SQL calendar script based on a smallint surrogate primary key
 
 There are two SQL scripts provided currently - one for PostgreSQL and one for SQL Server.  Each script is intended to run in their respective databases to create a Dates table.
 

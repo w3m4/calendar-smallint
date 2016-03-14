@@ -1,3 +1,17 @@
+IF OBJECT_ID('tempdb..#t') IS NOT NULL DROP TABLE #t
+
+ SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS n
+   INTO #t
+   FROM (VALUES (0), (0), (0), (0), (0), (0), (0), (0)) AS a (n)
+  CROSS
+   JOIN (VALUES (0), (0), (0), (0), (0), (0), (0), (0)) AS b (n)
+  CROSS
+   JOIN (VALUES (0), (0), (0), (0), (0), (0), (0), (0)) AS c (n)
+  CROSS
+   JOIN (VALUES (0), (0), (0), (0), (0), (0), (0), (0)) AS d (n)
+  CROSS
+   JOIN (VALUES (0), (0), (0), (0), (0), (0), (0), (0)) AS e (n)
+
 IF OBJECT_ID('dbo.[Dates]') IS NOT NULL DROP TABLE dbo.[Dates]
 
  CREATE TABLE dbo.[Dates] (
@@ -21,51 +35,51 @@ IF OBJECT_ID('dbo.[Dates]') IS NOT NULL DROP TABLE dbo.[Dates]
  )
 
 INSERT INTO dbo.[Dates] (
-  DateId, 
-  [Date], 
-	[Year], 
-	IsoYear, 
-	[Quarter], 
-	[Month], 
-	[MonthName], 
-	[Week], 
-	IsoWeek, 
-	[Day], 
-	[DayName], 
-	[DayOfWeek], 
-	IsoDayOfWeek, 
-	[DayOfYear], 
-	IsoDayOfYear, 
-	IsWeekDay, 
-	IsWeekEnd
+    DateId, 
+    [Date], 
+    [Year], 
+    IsoYear, 
+    [Quarter], 
+    [Month], 
+    [MonthName], 
+    [Week], 
+    IsoWeek, 
+    [Day], 
+    [DayName], 
+    [DayOfWeek], 
+    IsoDayOfWeek, 
+    [DayOfYear], 
+    IsoDayOfYear, 
+    IsWeekDay, 
+    IsWeekEnd
 )
 
  SELECT DateId, 
         [Date],
-		YEAR([Date]) AS [Year],
-		CASE
-		  WHEN DATEPART(ISO_WEEK, [Date]) > 51 AND MONTH([Date]) = 1 THEN -1
-		  WHEN DATEPART(ISO_WEEK, [Date]) = 1 AND MONTH([Date]) = 12 THEN +1
-		  ELSE 0
-		END + YEAR([Date]) AS IsoYear,
-		DATEPART(quarter, [Date]) AS [Quarter],
-		MONTH([Date]) AS [Month],
-		DATENAME(month, [Date]) AS [MonthName],
-		DATEPART(week, [Date]) AS [Week],
-		DATEPART(ISO_WEEK, [Date]) AS IsoWeek,
-		DAY([Date]) AS [Day],
-		DATENAME(weekday, [Date]) AS [DayName],
-		DATEPART(weekday, [Date]) AS [DayOfWeek],
-		DATEPART(weekday, DATEADD(DAY, -1, [Date])) AS IsoDayOfWeek,
-		DATEPART(dayofyear, [Date]) AS [DayOfYear],
-		ROW_NUMBER() OVER (PARTITION BY
-		  CASE
-			 WHEN DATEPART(ISO_WEEK, [Date]) > 51 AND MONTH([Date]) = 1 THEN -1
-			 WHEN DATEPART(ISO_WEEK, [Date]) = 1 AND MONTH([Date]) = 12 THEN +1
-		     ELSE 0
-		  END + YEAR([Date]) ORDER BY [Date]) AS IsoDayOfYear,
-		CASE WHEN DATEPART(weekday, [Date]) IN (1, 7) THEN 0 ELSE 1 END AS IsWeekday,
-		CASE WHEN DATEPART(weekday, [Date]) IN (1, 7) THEN 1 ELSE 0 END AS IsWeekend
+        YEAR([Date]) AS [Year],
+        CASE
+          WHEN DATEPART(ISO_WEEK, [Date]) > 51 AND MONTH([Date]) = 1 THEN -1
+          WHEN DATEPART(ISO_WEEK, [Date]) = 1 AND MONTH([Date]) = 12 THEN +1
+          ELSE 0
+        END + YEAR([Date]) AS IsoYear,
+        DATEPART(quarter, [Date]) AS [Quarter],
+        MONTH([Date]) AS [Month],
+        DATENAME(month, [Date]) AS [MonthName],
+        DATEPART(week, [Date]) AS [Week],
+        DATEPART(ISO_WEEK, [Date]) AS IsoWeek,
+        DAY([Date]) AS [Day],
+        DATENAME(weekday, [Date]) AS [DayName],
+        DATEPART(weekday, [Date]) AS [DayOfWeek],
+        DATEPART(weekday, DATEADD(DAY, -1, [Date])) AS IsoDayOfWeek,
+        DATEPART(dayofyear, [Date]) AS [DayOfYear],
+        ROW_NUMBER() OVER (PARTITION BY
+          CASE
+            WHEN DATEPART(ISO_WEEK, [Date]) > 51 AND MONTH([Date]) = 1 THEN -1
+            WHEN DATEPART(ISO_WEEK, [Date]) = 1 AND MONTH([Date]) = 12 THEN +1
+            ELSE 0
+          END + YEAR([Date]) ORDER BY [Date]) AS IsoDayOfYear,
+        CASE WHEN DATEPART(weekday, [Date]) IN (1, 7) THEN 0 ELSE 1 END AS IsWeekday,
+        CASE WHEN DATEPART(weekday, [Date]) IN (1, 7) THEN 1 ELSE 0 END AS IsWeekend
    FROM (
  SELECT -n AS DateId,
         DATEADD(DAY, -n, CAST('1970-01-01' AS date)) AS [Date]
